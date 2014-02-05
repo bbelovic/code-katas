@@ -27,6 +27,9 @@ public class TriangleSerializer {
     public Triangle deserialize(final String fileName) throws IOException {
         final Path inputPath = Paths.get(fileName);
         final List<String> inputData = Files.readAllLines(inputPath, UTF_8);
+        if (inputData.isEmpty()) {
+            throw new RuntimeException("Empty input file");
+        }
         final int [][] arr = new int [inputData.size()][];
         int x = 0;
         for (final String eachLine: inputData) {
