@@ -25,7 +25,7 @@ public class TriangleSerializerTest {
     private final TriangleSerializer triangleSerializer = new TriangleSerializer();
 
     @Test
-    public void should_serialize_correclty_define_triangle_into_output_file() throws Exception {
+    public void should_serialize_correctly_specified_triangle_into_output_file() throws Exception {
         final Triangle triangle = new Triangle(new int [][] {{0}, {1, 2}, {3, 4, 5}});
         triangleSerializer.serialize(triangle, ACTUAL_TRIANGLE_FILE);
         assertFileContents(ACTUAL_TRIANGLE_FILE, EXPECTED_TRIANGLE_FILE);

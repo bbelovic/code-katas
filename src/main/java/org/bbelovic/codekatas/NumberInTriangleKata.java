@@ -13,14 +13,12 @@ public class NumberInTriangleKata {
 
     public int compute() {
         int index = 0;
-        final int [][] triangleData = triangle.getTriangleData();
-        int sum = triangleData[0][0];
-        for (int i = 1; i < triangleData.length; i++) {
+        int sum = triangle.getElementAtPosition(0 ,0);
+        for (int i = 1; i < triangle.getSize(); i++) {
             final int idx1 = index;
             final int idx2 = index + 1;
-            final int [] row = triangleData[i];
-            final int val1 = row [idx1];
-            final int val2 = row [idx2];
+            final int val1 = triangle.getElementAtPosition(i, idx1);
+            final int val2 = triangle.getElementAtPosition(i, idx2);
             sum += Math.max(val1, val2);
             index = val1 > val2 ? idx1 : idx2;
         }

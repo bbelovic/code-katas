@@ -22,6 +22,24 @@ public class Triangle {
         return copyTriangleData();
     }
 
+    public int getSize() {
+        return triangleData.length;
+    }
+
+    public int getElementAtPosition(final int row, final int elementIndex) {
+        rangeCheck(row, elementIndex);
+        return triangleData [row][elementIndex];
+    }
+
+    private void rangeCheck(final int row, final int elementIndex) {
+        if (row >= triangleData.length || row < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (elementIndex > triangleData[row].length - 1 || elementIndex < 0) {
+            throw new IndexOutOfBoundsException();
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
