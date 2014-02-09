@@ -18,17 +18,25 @@ public class TriangleGeneratorTest {
     }
 
     private void assertTriangle(final Triangle actualTriangle) {
-        final int [][] triangleData = actualTriangle.getTriangleData();
-        assertEquals(triangleData.length, SIZE);
+        assertEquals(actualTriangle.getSize(), SIZE);
+        int rowLength = 1;
+        int elementCount = 0;
         for (int i = 0; i < SIZE; i++) {
-            assertEquals(triangleData[i].length, i + 1);
-            assertTriangleRowData(triangleData[i]);
+            for (int j = 0; j < rowLength; j++) {
+                final int element = actualTriangle.getElementAtPosition(i, j);
+                assertTrue(element < 10 && element >= 0);
+                elementCount++;
+            }
+            ++rowLength;
         }
+        assertEquals(elementCount, computeElementCount(SIZE));
     }
 
-    private void assertTriangleRowData(final int[] triangleRowData) {
-        for (final int aTriangleRowData : triangleRowData) {
-            assertTrue(aTriangleRowData < 10 && aTriangleRowData >= 0);
+    private int computeElementCount(final int size) {
+        int result = 0;
+        for (int i = size; i > 0; i--) {
+            result += i;
         }
+        return result;
     }
 }

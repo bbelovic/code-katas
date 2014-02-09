@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -44,19 +43,22 @@ public class TriangleSerializer {
     }
 
     private static String serialize(final Triangle triangle) {
-        final StringBuilder sb = new StringBuilder();
-        final int[][] triangleData = triangle.getTriangleData();
-        final String spaces = generateSpaces(triangleData.length-1);
-        for (int i = 0; i < triangleData.length; i++) {
-            sb.append(spaces.substring(i))
-                    .append(format(triangleLineAsString(triangleData[i]) + "%n"));
+        final int size = triangle.getSize();
+        int rowLength = 1;
+        final StringBuilder result = new StringBuilder();
+        final String spaces = generateSpaces(size - 1);
+        for (int i = 0; i < size; i++) {
+            result.append(spaces.substring(i));
+            final StringBuilder rowData = new StringBuilder();
+            for (int j = 0; j < rowLength; j++) {
+                int num = triangle.getElementAtPosition(i, j);
+                rowData.append(num);
+                rowData.append(" ");
+            }
+            result.append(format("%s%n", rowData.toString().trim()));
+            rowLength++;
         }
-        return sb.toString();
-    }
-
-    private static String triangleLineAsString(final int[] triangleLine) {
-        final String valueString = Arrays.toString(triangleLine);
-        return valueString.substring(1, valueString.length() - 1).replace(",", "");
+        return result.toString();
     }
 
     private static String generateSpaces(final int length) {
