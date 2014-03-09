@@ -6,7 +6,8 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+
+import static java.lang.String.format;
 
 public class BeanToStringBuilder {
 
@@ -24,50 +25,42 @@ public class BeanToStringBuilder {
         final StringBuilder sb = new StringBuilder();
         final String simpleName = target.getClass().getSimpleName();
         sb.append(simpleName);
-        final PropertyDescriptor[] propertyDescriptors = getPropertyDescriptors();
-            sb.append("[");
-            for (int i = 0; i < propertyDescriptors.length; i++) {
-                final PropertyDescriptor each = propertyDescriptors[i];
-                if (canIncludeInToString(each)) {
-                    includeInToString(each, sb, i != propertyDescriptors.length - 1);
-                }
-            }
-            sb.append("]");
+        buildToString(sb, getPropertyDescriptors());
         return sb.toString();
+    }
+
+    private void buildToString(StringBuilder sb, PropertyDescriptor[] propertyDescriptors) {
+        sb.append("[");
+        for (int i = 0; i < propertyDescriptors.length; i++) {
+            final PropertyDescriptor each = propertyDescriptors[i];
+            if (canIncludeInToString(each)) {
+                includeInToString(each, sb, i != propertyDescriptors.length - 1);
+            }
+        }
+        sb.append("]");
     }
 
     private PropertyDescriptor[] getPropertyDescriptors() {
         final BeanInfo beanInfo = getBeanInfo();
-        if (beanInfo == null) {
+        if (beanInfo == null || beanInfo.getPropertyDescriptors() == null) {
             return new PropertyDescriptor[0];
         }
-        Arrays.asList(beanInfo.getPropertyDescriptors());
         return beanInfo.getPropertyDescriptors();
     }
 
     private BeanInfo getBeanInfo() {
         try {
             return Introspector.getBeanInfo(target.getClass());
-        } catch (IntrospectionException e) {
-            e.printStackTrace();
+        } catch (final IntrospectionException e) {
+            throw new RuntimeException(format("Unable to introspect class=%s", target.getClass()), e);
         }
-        return null;
-    }
-
-    private Object invokeReadMethod(final Method readMethod) {
-        // TODO may return null
-        Object result = null;
-        try {
-            result = readMethod.invoke(target);
-        } catch (final IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return result;
     }
 
     private boolean canIncludeInToString(final PropertyDescriptor propertyDescriptor) {
-        // TODO handle possible nulls
         final Method method = propertyDescriptor.getReadMethod();
+        if (method == null) {
+            return false;
+        }
         final String displayName = propertyDescriptor.getDisplayName();
         return !"class".equals(displayName) && !method.isAnnotationPresent(LoggingIgnored.class);
     }
@@ -77,5 +70,20 @@ public class BeanToStringBuilder {
         final String displayName = descriptor.getDisplayName();
         final String result = displayName + "=" + invokeReadMethod(readMethod) + (appendDelimiter ? ", ": "");
         sb.append(result);
+    }
+
+    /* Invokes method reflectively and returns result.
+     * Provided method object is guaranteed not to be null.
+     * Null check is done in canIncludeInToString method which
+     * precedes invocation of this method
+     */
+    private Object invokeReadMethod(final Method readMethod) {
+        Object result;
+        try {
+            result = readMethod.invoke(target);
+        } catch (final IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException("Unable to invoke read method", e);
+        }
+        return result;
     }
 }
