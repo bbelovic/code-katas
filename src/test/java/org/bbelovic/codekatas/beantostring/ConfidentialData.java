@@ -3,7 +3,9 @@ package org.bbelovic.codekatas.beantostring;
 class ConfidentialData {
 
     private final String username;
+    @LoggingIgnored
     private final String password;
+    @LoggingIgnored
     private final String pin;
     private final String email;
 
