@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 
 import static java.lang.String.format;
 
-public class ReadMethodToStringStrategy implements ToStringStrategy {
+public class ReadMethodToStringStrategy extends AbstractToStringStrategy {
 
     private final Object target;
 
@@ -77,10 +77,18 @@ public class ReadMethodToStringStrategy implements ToStringStrategy {
      * Null check is done in canIncludeInToString method which
      * precedes invocation of this method
      */
-    private Object invokeReadMethod(final Method readMethod) {
-        Object result;
+    private String invokeReadMethod(final Method readMethod) {
+        String result;
         try {
-            result = readMethod.invoke(target);
+            final Object fieldValue = readMethod.invoke(target);
+            if (fieldValue == null) {
+                result = "null";
+            } else if (fieldValue.getClass().isArray()) {
+                result = dumpArray(fieldValue);
+            } else {
+                result = fieldValue.toString();
+            }
+
         } catch (final IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("Unable to invoke read method", e);
         }

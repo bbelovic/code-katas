@@ -6,7 +6,7 @@ import java.util.*;
 
 import static java.lang.String.format;
 
-public class DirectFieldAccessToStringStrategy implements ToStringStrategy {
+public class DirectFieldAccessToStringStrategy extends AbstractToStringStrategy {
 
     private final Object target;
 
@@ -30,21 +30,28 @@ public class DirectFieldAccessToStringStrategy implements ToStringStrategy {
         final Iterator<Field> it = fieldsForToString.iterator();
         if (it.hasNext()) {
             final Field field = it.next();
-            sb.append(format("%s=%s", field.getName(), getFieldValue(field)));
+            sb.append(format("%s=%s", field.getName(), dumpFieldValue(field)));
         }
         while (it.hasNext()) {
             final Field field = it.next();
-            sb.append(format(", %s=%s", field.getName(), getFieldValue(field)));
+            sb.append(format(", %s=%s", field.getName(), dumpFieldValue(field)));
         }
         sb.append("]");
         return sb.toString();
     }
 
-    private Object getFieldValue(Field field) {
+    private String dumpFieldValue(final Field field) {
         try {
-            return field.get(this.target);
+            final Object fieldValue = field.get(this.target);
+            if (fieldValue == null) {
+                return null;
+            } else if (fieldValue.getClass().isArray()) {
+                return dumpArray(fieldValue);
+            } else {
+                return fieldValue.toString();
+            }
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("Unable to get value of field="+ field.getName(), e);
+            throw new RuntimeException("Unable to get value for field="+ field.getName(), e);
         }
     }
 
@@ -65,10 +72,11 @@ public class DirectFieldAccessToStringStrategy implements ToStringStrategy {
         return filteredFields;
     }
 
-    private static final Comparator<Field> FIELD_COMPARATOR =  new Comparator<Field>() {
+    private static final Comparator<Field> FIELD_COMPARATOR = new Comparator<Field>() {
         @Override
         public int compare(Field o1, Field o2) {
             return o1.getName().compareTo(o2.getName());
         }
     };
+
 }
