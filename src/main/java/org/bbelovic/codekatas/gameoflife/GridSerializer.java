@@ -12,7 +12,7 @@ import static java.lang.String.format;
 
 public class GridSerializer {
 
-    public static void serializeToFile(final Grid grid, final String outputFile) throws IOException {
+    public void serializeToFile(final Grid grid, final String outputFile) throws IOException {
         final Path outputPath = Paths.get(outputFile);
         final int width = grid.getWidth();
         final int height = grid.getHeight();
@@ -28,7 +28,7 @@ public class GridSerializer {
         Files.write(outputPath, lines);
     }
 
-    public static Grid deserializeFromFile(final String inputFile) throws IOException {
+    public Grid deserializeFromFile(final String inputFile) throws IOException {
         final List<String> lines = Files.readAllLines(Paths.get(inputFile));
         final int height = lines.size();
         final Cell[][] cells = new Cell[height][];

@@ -18,9 +18,11 @@ public class GridSerializerTest {
     private static final String FILENAME = TEST_RESOURCES_DIR + "/grid.txt";
     private static final String VALID_GRID = TEST_RESOURCES_DIR + "/validGrid.txt";
     private static final String INVALID_GRID = TEST_RESOURCES_DIR + "/invalidGrid.txt";
+    private GridSerializer gridSerializer;
 
     @BeforeMethod
     public void setUp() throws IOException {
+        gridSerializer = new GridSerializer();
         Files.deleteIfExists(Paths.get(FILENAME));
 
     }
@@ -34,14 +36,14 @@ public class GridSerializerTest {
                 {new Cell(false), new Cell(false), new Cell(false), new Cell(false)}
         };
         final Grid grid = new Grid(initCells);
-        GridSerializer.serializeToFile(grid, FILENAME);
+        gridSerializer.serializeToFile(grid, FILENAME);
         final List<String> lines = Files.readAllLines(Paths.get(FILENAME));
         assertEquals(lines, asList("0000", "0110", "0110", "0000"));
     }
 
     @Test
     public void should_deserialize_grid_from_output_file() throws IOException {
-        final Grid actual = GridSerializer.deserializeFromFile(VALID_GRID);
+        final Grid actual = gridSerializer.deserializeFromFile(VALID_GRID);
         final Grid expected = new Grid(new Cell[][] {{new Cell(false), new Cell(false)},
                                                      {new Cell(true), new Cell(true)}});
         assertEquals(actual, expected);
@@ -49,6 +51,6 @@ public class GridSerializerTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void should_throw_exception_when_input_file_has_invalid_format() throws IOException {
-        GridSerializer.deserializeFromFile(INVALID_GRID);
+        gridSerializer.deserializeFromFile(INVALID_GRID);
     }
 }
