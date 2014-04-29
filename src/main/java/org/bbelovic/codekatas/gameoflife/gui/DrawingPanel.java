@@ -1,6 +1,5 @@
 package org.bbelovic.codekatas.gameoflife.gui;
 
-import org.bbelovic.codekatas.gameoflife.Cell;
 import org.bbelovic.codekatas.gameoflife.Grid;
 import org.bbelovic.codekatas.gameoflife.Transformer;
 
@@ -17,6 +16,7 @@ public class DrawingPanel extends JPanel implements ActionListener {
     private static final int SQUARE_SIZE = 20;
     private static final int VERTICAL_OFFSET = 1 * SQUARE_SIZE;
     private static final int HORIZONTAL_OFFSET = 1 * SQUARE_SIZE;
+    private static final int DELAY = 1000;
 
     private Transformer transformer = new Transformer();
     private Grid grid;
@@ -24,17 +24,20 @@ public class DrawingPanel extends JPanel implements ActionListener {
 
     public DrawingPanel(Grid grid) {
         this.grid = grid;
-        this.timer = new Timer(1000, this);
+        this.timer = new Timer(DELAY, this);
         timer.start();
     }
-
-    private static final Grid GRID = new Grid(new Cell[][] {{new Cell(false), new Cell(true)},
-            {new Cell(true), new Cell(false)}});
 
     @Override
     public void paintComponent(final Graphics g) {
         paintBackground(g);
         paintGrid(grid, g);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        grid = transformer.transform(grid);
+        repaint();
     }
 
     private void paintBackground(final Graphics g) {
@@ -56,11 +59,5 @@ public class DrawingPanel extends JPanel implements ActionListener {
                 }
             }
         }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        grid = transformer.transform(grid);
-        repaint();
     }
 }

@@ -1,50 +1,30 @@
 package org.bbelovic.codekatas.gameoflife.gui;
 
-import org.bbelovic.codekatas.gameoflife.Cell;
 import org.bbelovic.codekatas.gameoflife.Grid;
-import org.bbelovic.codekatas.gameoflife.GridSerializer;
 
 import javax.swing.*;
-import java.io.IOException;
 
+import static java.util.Objects.requireNonNull;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
 public class ApplicationFrame {
-    private JFrame frame;
+    private static final int WIDTH = 402;
+    private static final int HEIGHT = 433;
+    private final Grid grid;
 
-    public ApplicationFrame() {
-
-        init();
+    public ApplicationFrame(final Grid grid) {
+        this.grid = requireNonNull(grid, "Input grid can't be null");
     }
 
-    private void init() {
-        frame = new JFrame();
-        frame.setBounds(0, 0, 402, 433);
-        final Grid grid = readInputGrid();
-        frame.add(new DrawingPanel(grid));
+
+    public void createAndShowGui() {
+        final JFrame frame = new JFrame();
+        frame.setBounds(0, 0, WIDTH, HEIGHT);
+        final DrawingPanel drawingPanel = new DrawingPanel(grid);
+        frame.add(drawingPanel);
         frame.setTitle("Conway's game of life");
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.setVisible(true);
-    }
-
-    private Grid readInputGrid() {
-        try {
-//            return GridSerializer.deserializeFromFile("./src/main/resources/gameoflife/blinker.txt");
-//            return GridSerializer.deserializeFromFile("./src/main/resources/gameoflife/beacon.txt");
-            return GridSerializer.deserializeFromFile("./src/main/resources/gameoflife/octagon4.txt");
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
-        return new Grid(new Cell[][] {{}});
-    }
-
-    public static void main( String[] args )
-    {
-        final Runnable doRun = () -> {new ApplicationFrame();};
-        /*
-         * Runs GUI safely on AWT event dispatching thread.
-         */
-        SwingUtilities.invokeLater(doRun);
     }
 }
